@@ -1,3 +1,9 @@
+# Data
+/data/*
+
+#Databases
+/databases/*
+
 # History files
 .Rhistory
 .Rapp.history

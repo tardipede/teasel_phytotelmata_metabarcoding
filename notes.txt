@@ -1,0 +1,15 @@
+# git useful commands
+git status
+git add .
+git commit -m "git commit message"
+git push
+
+
+# conda/mamba useful commands
+mamba env create -f DP_metabar.yml
+mamba env update -f DP_metabar.yml
+mamba env remove -n DP_metabar
+
+conda activate DP_metabar
+
+mamba env create -f trim_galore.yml
