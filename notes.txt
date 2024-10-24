@@ -1,15 +1,14 @@
+## These are just random commands that I keep here as sometimes I forget them
+
 # git useful commands
 git status
 git add .
 git commit -m "git commit message"
 git push
 
-
 # conda/mamba useful commands
 mamba env create -f environment.yml
 mamba env update -f environment.yml
 mamba env remove -n DP_metabar
-
 conda activate DP_metabar
 
-mamba env create -f trim_galore.yml

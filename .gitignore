@@ -1,16 +1,19 @@
 # Data
 /data/*
 
-#Databases
-/databases/*
-
 # History files
 .Rhistory
 .Rapp.history
 
+# Databases files
+#/databases/*
+
 # Session Data files
 .RData
 .RDataTmp
+
+# lintr
+.lintr
 
 # User-specific files
 .Ruserdata
