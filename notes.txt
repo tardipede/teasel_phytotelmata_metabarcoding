@@ -6,8 +6,8 @@ git push
 
 
 # conda/mamba useful commands
-mamba env create -f DP_metabar.yml
-mamba env update -f DP_metabar.yml
+mamba env create -f environment.yml
+mamba env update -f environment.yml
 mamba env remove -n DP_metabar
 
 conda activate DP_metabar

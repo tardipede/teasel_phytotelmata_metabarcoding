@@ -3,8 +3,8 @@
 # Read command line arguments
 args <- commandArgs(trailingOnly = TRUE)
 # Check if arguments are provided
-if (length(args) == 0) {
-  stop("No arguments provided, provide run name [arg1], data folder [arg2] and marker (18S or 16S) [arg3]")
+if (length(args) != 3) {
+  stop("Wrong number of arguments provided, provide run name [arg1], data folder [arg2] and marker (18S or 16S) [arg3]")
 }
 
 
@@ -158,4 +158,3 @@ seqtab.nochim.filtered_length <-  seqtab.nochim[ ,nchar(colnames(seqtab.nochim))
 seqtab.nochim.filtered_length.filtered_min_abundance<-seqtab.nochim.filtered_length[ , apply(seqtab.nochim.filtered_length,2,sum) >= 10]   #filtering reads with counts < 10 
 # sorting by abundance
 seqtab.nochim.filtered_length.filtered_min_abundance<-seqtab.nochim.filtered_length.filtered_min_abundance[, order(-colSums(seqtab.nochim.filtered_length.filtered_min_abundance))]  
-
