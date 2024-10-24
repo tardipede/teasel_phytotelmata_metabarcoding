@@ -132,3 +132,99 @@ lulu <- function(otutable, matchlist, minimum_ratio_type = "min", minimum_ratio 
 
   return(result)
 }
+
+
+##### Import al files in a folder to create a phyloseq object
+### In the folder you need 4 files
+## OTU table with taxonomy (file name ends with .csv) and must contain:
+# Column named "output" with taxonomy 
+# Column names "OTU" with Otu names
+# Columns with samples (columns names are sample names)
+## Sample data (file name ends with.txt) and must contain:
+# Column named "sample" with samples names
+# Any other column with additional samples data
+## Phylogenetic tree (file name ends with .tre)
+## Aligned OTUs (file name ends with .fas)
+###### path indicates the folder path where all these files are present
+make_phyloseq = function(paths,taxonomy_ranks){
+  require(ape)
+  require(Biostrings)
+  require(phyloseq)
+  require(magrittr)
+  require(tidyverse)
+
+  # Get the different files
+  otu_file = paths[grepl(".csv",paths)]
+  tree_file = paths[grepl(".tre",paths)]
+  seqs_file = paths[grepl(".fas",paths)]
+  metadata_file = paths[grepl(".txt",paths)]
+
+
+  # Load files
+  otu_tab = read.table(otu_file, sep = "\t", header = T);  rownames(otu_tab) = otu_tab$ASV
+  sample_dat = read.table(metadata_file, sep = "\t", header = T); rownames(sample_dat) = sample_dat$sample
+  tree = ape::read.tree(tree_file)
+  seqs = Biostrings::readDNAStringSet(seqs_file)
+  
+  # Prepare the components to build a phyloseq object
+  
+  ## OTU table
+  phyloseq_otu_tab = phyloseq::otu_table(otu_tab[,colnames(otu_tab) %in% sample_dat$sample], taxa_are_rows = T)
+  
+  ## Taxonomy table
+  ### Extract taxonomy from otutable
+  taxonomy_table  = otu_tab$output %>%
+    gsub("\\s*\\([^\\)]+\\)", "", .) %>%
+    gsub(" ","",.) %>%
+    strsplit(.,";") %>%
+    lapply(., FUN = function(x){data.frame(t(x))}) %>%
+    do.call(plyr::rbind.fill, .)
+  
+  taxonomy_table = as.matrix(taxonomy_table)
+  
+  colnames(taxonomy_table) = taxonomy_ranks
+  rownames(taxonomy_table) = otu_tab$ASV
+  
+  phyloseq_tax_tab = phyloseq::tax_table(taxonomy_table)
+  
+  ## Sample data
+  phyloseq_sample_data = phyloseq::sample_data(sample_dat)
+  
+  ## Phylogenetic tree
+  phyloseq_tree = phyloseq::phy_tree(tree)
+  
+  ## Sequences
+  phyloseq_seqs = phyloseq::refseq(seqs)
+  
+  # Assembly phyoseq object
+  dataset = phyloseq(phyloseq_otu_tab, phyloseq_sample_data, phyloseq_tax_tab, phyloseq_tree, phyloseq_seqs)
+    
+  return(dataset)
+}
+
+##### Subtract reads in blank from all the samples
+# Following https://doi.org/10.1002/edn3.372
+subtract_blank = function(phyloseq_object, blank_name){
+  require(phyloseq)
+
+  
+  otu_tab_temp = data.frame(otu_table(phyloseq_object))
+  otu_tab_temp = sweep(otu_tab_temp, MARGIN = 1, STATS = otu_tab_temp[,blank_name], FUN = "-")
+  otu_tab_temp[otu_tab_temp<0] = 0
+  new_otu_table = phyloseq::otu_table(otu_tab_temp, taxa_are_rows = T)
+  
+  phyloseq_object_new = phyloseq(new_otu_table, sample_data(phyloseq_object), phy_tree(phyloseq_object), tax_table(phyloseq_object), refseq(phyloseq_object))
+  
+ # samples_to_keep = data.frame(sample_data(phyloseq_object_new))$sample != blank_name
+  
+  #otu_table(phyloseq_object) = new_otu_table
+  #phyloseq_object_new = phyloseq::subset_samples(phyloseq_object_new, samples_to_keep)
+  
+  return(phyloseq_object_new)
+}
+
+##### Save RDS and return object (to use with magrittr %>%)
+saveRDS_pipe = function(object_to_save, filename){
+  saveRDS(object_to_save, filename)
+  return(object_to_save)
+}

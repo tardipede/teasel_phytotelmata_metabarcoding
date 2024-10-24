@@ -8,6 +8,9 @@
 # Databases files
 /databases/*
 
+# My notes
+notes.txt
+
 # Session Data files
 .RData
 .RDataTmp

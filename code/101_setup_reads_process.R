@@ -22,9 +22,9 @@ RUN_NAME <- args[1]
 DATA_FOLDER <- args[2]
 MARKER <- args[3]
 
-#RUN_NAME <- "BAC"
-#DATA_FOLDER <- "16S"
-#MARKER <- "16S"
+#RUN_NAME <- "EUK"
+#DATA_FOLDER <- "18S"
+#MARKER <- "18S"
 
 
 # Create variables used in the script

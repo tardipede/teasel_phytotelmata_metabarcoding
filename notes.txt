@@ -6,9 +6,13 @@ git add .
 git commit -m "git commit message"
 git push
 
+#Delete the most recent commit, keeping the work you've done:
+git reset --soft HEAD~1
+
 # conda/mamba useful commands
 mamba env create -f environment.yml
 mamba env update -f environment.yml
 mamba env remove -n DP_metabar
 conda activate DP_metabar
+
 
