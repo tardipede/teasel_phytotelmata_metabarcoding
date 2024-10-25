@@ -9,7 +9,9 @@ Data processing and analysis for the manuscript "First insight into teasel phyto
 
 
 
-<img src="images/Image_dipsacus_3.jpg" width="100" height="100">
+<img src="images/Image_dipsacus_3.jpg" width="150">
+<img src="images/Image_dipsacus_1.jpg" width="300">
+<img src="images/Image_dipsacus_2.jpg" width="300">
 
 
 
