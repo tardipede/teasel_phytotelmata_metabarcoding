@@ -45,4 +45,12 @@ richness_all = rbind(meta_richness, fungi_richness, algae_richness, prot_richnes
 richness_all$Evenness = richness_all$Shannon/log(richness_all$Observed)
 
 write.table(richness_all, "./intermediates/richness_tab.txt", sep = "\t",  quote = F, row.names = F)
-writexl::write_xlsx(richness_all, "./results/tables/richness_stats.xlsx")
+
+### Save richness summary table
+
+richness_summary =  aggregate(richness_all[,c("Observed","Evenness","FaithPD")], by = list(richness_all$site, richness_all$level, richness_all$taxa), FUN = function(x){round(c(mean(x), min(x), max(x)),2)})
+richness_summary = do.call(data.frame, richness_summary) 
+
+colnames(richness_summary) = c("Site","Level","taxa","Obs-mean","Obs-min","Obs-max","Eve-mean","Eve-min","Eve-max","PD-mean","PD-min","PD-mad")
+
+writexl::write_xlsx(richness_summary, "./results/tables/richness_summary.xlsx")
