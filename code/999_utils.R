@@ -305,3 +305,98 @@ estimate_richness = function (physeq, split = TRUE, measures = NULL) {
   out <- as.data.frame(out)
   return(out)
 }
+
+
+
+##  continuous Bernoulli familt for brms from:
+# https://www.robertkubinec.com/post/frac_logit/
+# https://discourse.mc-stan.org/t/brms-custom-family-continuous-bernoulli/30442
+require(brms)
+# define custom family
+c_bernoulli <- brms::custom_family("c_bernoulli",
+                             dpars="mu",
+                             links="logit",
+                             lb=0,ub=1,
+                             type="real")
+
+# define log density function
+# some code from spinkey https://discourse.mc-stan.org/t/continuous-bernoulli/26886
+stan_funs <- "
+
+  //normalization Cconstant
+  real c_norm(real mu) {
+  
+    if(mu==0.5) {
+    
+      return log(2);
+        
+    } else {
+    
+      real Cconst = (log(2 - 2*mu) - log(2*mu))/(2 * (1 - 2*mu));
+      return(log(Cconst));
+                
+    }
+  
+  }
+  
+  // log PDF for continuous Bernoulli
+  real c_bernoulli_lpdf(real y, real mu) {
+  
+    // unnormalized density
+    
+    real lp = y * log(mu) + (1 - y) * log1m(mu);
+    
+    // normalized density
+   
+    lp += c_norm(mu);
+      
+    return lp;
+    
+  }"
+
+stanvars <- brms::stanvar(scode = stan_funs, block = "functions")
+
+# posterior predictions
+posterior_predict_c_bernoulli <- function(i, prep, ...) {
+  
+  # need inverse CDF function for continuous bernoulli
+  
+  inv_cdf <- function(u=NULL, mu=NULL) {
+    
+    if(mu==0.5) {
+      
+      out <- u
+      
+    } else {
+      
+      out <- (log(u * (2 * mu - 1) + 1 - mu) - log(1 - mu))/(log(mu) - (log(1-mu)))
+      
+    }
+    
+    return(out)
+    
+  }
+  
+  mu <- brms::get_dpar(prep, "mu", i = i)
+  u <- runif(n=length(mu))
+  
+  inv_cdf(u,mu)
+  
+}
+
+posterior_epred_c_bernoulli <- function(prep) {
+  
+  # expected value
+  mu <- brms::get_dpar(prep, "mu")
+  
+  if(mu==0.5) {
+    
+    return(0.5)
+    
+  } else {
+    
+    (mu / (2 * mu - 1)) + (1 / (2*atanh(1 - 2*mu)))
+    
+  }
+  
+}

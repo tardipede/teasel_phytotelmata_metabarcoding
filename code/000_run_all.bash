@@ -14,3 +14,9 @@ Rscript code/103_calculate_richness.R
 
 # Plot alpha richness
 Rscript code/104_plot_richness.R
+
+# Do stats on richness
+Rscript code/105_stats_richness.R
+
+# NMDS ordinations
+Rscript code/106_ordinations.R
