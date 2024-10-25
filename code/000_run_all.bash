@@ -11,3 +11,6 @@ Rscript code/102_create_phyloseq_objects.R
 
 # Calculate alpha diversity
 Rscript code/103_calculate_richness.R
+
+# Plot alpha richness
+Rscript code/104_plot_richness.R
