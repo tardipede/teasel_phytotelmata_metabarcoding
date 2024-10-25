@@ -2,14 +2,14 @@
 Data processing and analysis for the manuscript "First insight into teasel phytotelmata biotic communities through DNA metabarcoding"
 
 | Teasel plant  [^1] | Teasel flower [^2] | Teasel phytotelm [^3] |
-| ------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| ------------- | ------------- | ------------- |
 |![Teasel plant](images/Image_dipsacus_3.jpg)|![Teasel flower](images/Image_dipsacus_1.jpg)|![Teasel phytotelm](images/Image_dipsacus_2.jpg)|
 
 
 
 
 
-
+<img src="images/Image_dipsacus_3.jpg" width="100" height="100">
 
 
 
