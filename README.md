@@ -3,7 +3,7 @@ Data processing and analysis for the manuscript "First insight into teasel phyto
 
 | Teasel plant  [^1] | Teasel flower [^2] | Teasel phytotelm [^3] |
 | ------------- | ------------- | ------------- |
-|<img src="images/Image_dipsacus_3.jpg" height ="200">|<img src="images/Image_dipsacus_1.jpg" height ="200">|<img src="images/Image_dipsacus_2.jpg" height ="200">|
+|<img src="images/Image_dipsacus_3.jpg" height ="220">|<img src="images/Image_dipsacus_1.jpg" height ="220">|<img src="images/Image_dipsacus_2.jpg" height ="220">|
 
 
 
