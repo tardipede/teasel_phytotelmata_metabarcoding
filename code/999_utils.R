@@ -400,3 +400,33 @@ posterior_epred_c_bernoulli <- function(prep) {
   }
   
 }
+
+#### Clean brmsfit output for stat richness
+clean_brm_output = function(brm_fit){
+  require(performance)
+  require(bayestestR)
+  
+  chains = as.data.frame(brm_fit)
+  chains = chains[,c("b_Intercept","bsp_molevel","sd_plant__Intercept","sd_site__Intercept")]
+  
+  summary_chains = as.data.frame(t(apply(chains, MARGIN = 2, FUN = function(x){c(mean(x), as.numeric(bayestestR::hdi(x,ci = 0.95, verbose = TRUE))[2:3])})))
+  colnames( summary_chains) = c("Average","CI95low","CI95high")
+  colnames( summary_chains) = c("Average","CI95low","CI95high")
+  
+  p_dirs = p_direction(chains[,1:2])
+  summary_chains$p = c(pd_to_p(p_dirs$pd),NA,NA)
+  
+  r2vals = r2(brm_fit)
+  
+  r2vals = data.frame(rbind(
+  c(r2vals$R2_Bayes_marginal, as.numeric(attributes(r2vals)$CI$R2_Bayes_marginal)[2:3]),
+  c(r2vals$R2_Bayes, as.numeric(attributes(r2vals)$CI$R2_Bayes)[2:3]),
+  rep(NA,3), rep(NA,3)))
+  colnames(r2vals) = c("Average","CI95low","CI95high")
+  r2vals = cbind(data.frame(name = c("R2_marginal","R2_conditional","","")),r2vals)
+  
+  
+  summary_chains = cbind(data.frame(predictor = rownames(summary_chains)),summary_chains,r2vals)
+
+  return(summary_chains)
+}

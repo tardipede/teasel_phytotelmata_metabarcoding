@@ -9,8 +9,11 @@ source("./code/999_utils.R")
 # Load richness table
 richness_all = read.table("intermediates/richness_tab.txt", sep = "\t", header = TRUE)
 
+# Remove Algae
+richness_all = subset(richness_all , taxa != "Algae")
+
 # Transform into long format
-richness_all = tidyr::pivot_longer(richness_all, c("Observed","Evenness","FaithPD")) %>%
+richness_all =  tidyr::pivot_longer(richness_all, c("Observed","Evenness","FaithPD")) %>%
   mutate(name = factor(name, levels = c("Observed","FaithPD","Evenness")),
          taxa = factor(taxa, levels = c("Bacteria","Fungi","Protists","Algae","Metazoa")))
 

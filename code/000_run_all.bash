@@ -20,3 +20,7 @@ Rscript code/105_stats_richness.R
 
 # NMDS ordinations
 Rscript code/106_ordinations.R
+
+
+# Save otu tables qith taxonomy as excel files
+Rscript code/110_save_otu_tables_in_excel.R
