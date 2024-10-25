@@ -7,6 +7,7 @@
 
 # Databases files
 /databases/*
+!/databases/readme.txt
 
 # My notes
 notes.txt
