@@ -15,4 +15,15 @@ mamba env update -f environment.yml
 mamba env remove -n DP_metabar
 conda activate DP_metabar
 
+### Download runs from SRA
 
+# Download the RunInfo table (https://www.ncbi.nlm.nih.gov/Traces/study/?WebEnv=NCID_1_74280305_130.14.18.97_5555_1548224368_3125055013_0MetA0_S_HStore&query_key=3) and use parallel to download multiple files at once.
+# From discussion: https://www.biostars.org/p/359441/
+
+#!/bin/bash
+#change the number after  -j change the number of files to be processed.
+parallel --verbose -j 20 prefetch {} ::: $(cut -f5 SraRunTable.txt ) >>sra_download.log
+wait
+parallel --verbose -j 20 fastq-dump --split-files {} ::: $(cut -f5 SraRunTable.txt ) >>sra_dump.log
+wait
+exit
