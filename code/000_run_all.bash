@@ -21,6 +21,13 @@ Rscript code/105_stats_richness.R
 # NMDS ordinations
 Rscript code/106_ordinations.R
 
+# Plot nestedness proportion
+Rscript code/107_plot_nestedness.R
 
-# Save otu tables qith taxonomy as excel files
+# Do stats on nestedness
+Rscript code/108_stats_nestedness.R
+
+
+
+# Save otu tables with taxonomy as excel files
 Rscript code/110_save_otu_tables_in_excel.R

@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 
 library(betapart, quietly = TRUE)
 library(phyloseq, quietly = TRUE)
