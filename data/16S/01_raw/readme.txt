@@ -1,0 +1,1 @@
+In this folder place all the fastq.gz files with the 16S reads
