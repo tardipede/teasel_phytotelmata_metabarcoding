@@ -10,6 +10,9 @@ richness_all = read.table("intermediates/richness_tab.txt", sep = "\t", header =
 richness_all$level = factor(richness_all$level, levels = c(0,1,2), ordered = T)
 
 ########## RUN MODELS
+#If the monotonic effect is used in a linear model, 
+#b can be interpreted as the expected average difference between two adjacent categories of the ordinal predictor.
+# https://cran.r-project.org/web/packages/brms/vignettes/brms_monotonic.html#:~:text=If%20the%20monotonic%20effect%20is,categories%20of%20the%20ordinal%20predictor.
 
 
 ### OBSERVED DIVERSITY
@@ -80,6 +83,8 @@ writexl::write_xlsx(models_pd, "./results/tables/models_pd.xlsx")
 
 ### EVENNESS
 
+richness_all$Evenness[richness_all$Evenness == 0] = exp(-20); richness_all$Evenness[richness_all$Evenness == 1] = 1-exp(-20) # Beta fmily does not accept 0 and 1, so they are replaced with ver close values
+
 
 model_eve_meta = brm(Evenness ~ mo(level) + (1|site) + (1|plant), data = subset(richness_all, taxa == "Metazoa"), family = Beta(link = "logit", link_phi = "log"),
                      seed = 4321,
@@ -92,7 +97,7 @@ model_eve_fungi = brm(Evenness ~ mo(level) + (1|site) + (1|plant), data = subset
                       chains = 4, iter = 40000, warmup = 5000, thin = 30)
 
 
-model_eve_prot = brm(Evenness ~ mo(level) + (1|site) + (1|plant), data = subset(richness_all, taxa == "Protists"), family = c_bernoulli, stanvars = stanvars,
+model_eve_prot = brm(Evenness ~ mo(level) + (1|site) + (1|plant), data = subset(richness_all, taxa == "Protists"), family = Beta(link = "logit", link_phi = "log"),
                      seed = 4321,
                      control = list(adapt_delta = 0.99, stepsize = 0.001, max_treedepth = 20),
                      chains = 4, iter = 40000, warmup = 5000, thin = 30)

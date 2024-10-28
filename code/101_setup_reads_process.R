@@ -3,8 +3,8 @@
 # Read command line arguments
 args <- commandArgs(trailingOnly = TRUE)
 # Check if arguments are provided
-if (length(args) != 3) {
-  stop("Wrong number of arguments provided, provide RUN_NAME [arg1], DATA_FOLDER [arg2] and MARKER [arg3](18S or 16S)")
+if (length(args) != 5) {
+  stop("Wrong number of arguments provided, provide RUN_NAME [arg1], DATA_FOLDER [arg2], MARKER [arg3](18S or 16S), RUN_REGEX [arg4] and SAMPLE_REGEX [arg5]")
 }
 
 ## Libraryes
@@ -21,10 +21,14 @@ source("./code/999_utils.R")
 RUN_NAME <- args[1]
 DATA_FOLDER <- args[2]
 MARKER <- args[3]
+RUN_REGEX <- args[4]
+SAMPLE_REGEX <- args[5]
 
 #RUN_NAME <- "EUK"
 #DATA_FOLDER <- "18S"
 #MARKER <- "18S"
+#RUN_REGEX <- "(ID[0-9]{4})"
+#SAMPLE_REGEX <- "((DFP)-.{3})"
 
 
 # Create variables used in the script
@@ -74,8 +78,8 @@ if (!dir.exists(trim_path)) dir.create(trim_path, recursive = TRUE)
 sample_table <- tibble::tibble(
   fastq_R1 = sort(list.files(raw_path, ".*R1(_001)?.fastq.gz",full.names = T)),
   fastq_R2 = sort(list.files(raw_path, ".*R2(_001)?.fastq.gz",full.names = T))
-)  %>%  dplyr::mutate(runcode = stringr::str_extract(fastq_R1,"(ID[0-9]{4})"),        # Extract run code
-                      sample = stringr::str_extract(fastq_R1,"((Blank|DFP)-.{3})"))   # Extract sample code
+)  %>%  dplyr::mutate(runcode = stringr::str_extract(fastq_R1,RUN_REGEX),        # Extract run code
+                      sample = stringr::str_extract(fastq_R1,SAMPLE_REGEX))   # Extract sample code
 
 
 # generate filenames for trimmed and filtered reads

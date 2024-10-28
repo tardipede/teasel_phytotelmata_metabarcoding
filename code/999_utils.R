@@ -307,100 +307,6 @@ estimate_richness = function (physeq, split = TRUE, measures = NULL) {
 }
 
 
-
-##  continuous Bernoulli familt for brms from:
-# https://www.robertkubinec.com/post/frac_logit/
-# https://discourse.mc-stan.org/t/brms-custom-family-continuous-bernoulli/30442
-require(brms)
-# define custom family
-c_bernoulli <- brms::custom_family("c_bernoulli",
-                             dpars="mu",
-                             links="logit",
-                             lb=0,ub=1,
-                             type="real")
-
-# define log density function
-# some code from spinkey https://discourse.mc-stan.org/t/continuous-bernoulli/26886
-stan_funs <- "
-
-  //normalization Cconstant
-  real c_norm(real mu) {
-  
-    if(mu==0.5) {
-    
-      return log(2);
-        
-    } else {
-    
-      real Cconst = (log(2 - 2*mu) - log(2*mu))/(2 * (1 - 2*mu));
-      return(log(Cconst));
-                
-    }
-  
-  }
-  
-  // log PDF for continuous Bernoulli
-  real c_bernoulli_lpdf(real y, real mu) {
-  
-    // unnormalized density
-    
-    real lp = y * log(mu) + (1 - y) * log1m(mu);
-    
-    // normalized density
-   
-    lp += c_norm(mu);
-      
-    return lp;
-    
-  }"
-
-stanvars <- brms::stanvar(scode = stan_funs, block = "functions")
-
-# posterior predictions
-posterior_predict_c_bernoulli <- function(i, prep, ...) {
-  
-  # need inverse CDF function for continuous bernoulli
-  
-  inv_cdf <- function(u=NULL, mu=NULL) {
-    
-    if(mu==0.5) {
-      
-      out <- u
-      
-    } else {
-      
-      out <- (log(u * (2 * mu - 1) + 1 - mu) - log(1 - mu))/(log(mu) - (log(1-mu)))
-      
-    }
-    
-    return(out)
-    
-  }
-  
-  mu <- brms::get_dpar(prep, "mu", i = i)
-  u <- runif(n=length(mu))
-  
-  inv_cdf(u,mu)
-  
-}
-
-posterior_epred_c_bernoulli <- function(prep) {
-  
-  # expected value
-  mu <- brms::get_dpar(prep, "mu")
-  
-  if(mu==0.5) {
-    
-    return(0.5)
-    
-  } else {
-    
-    (mu / (2 * mu - 1)) + (1 / (2*atanh(1 - 2*mu)))
-    
-  }
-  
-}
-
 #### Clean brmsfit output for stat richness
 clean_brm_output = function(brm_fit){
   require(performance)
@@ -430,3 +336,125 @@ clean_brm_output = function(brm_fit){
 
   return(summary_chains)
 }
+
+
+### Function from https://github.com/vmikk/metagMisc/blob/master/R/dist2list.R
+#' @title Convert distance matrix to data frame
+#' @description This function takes a distance matrix (of class 'dist') and transforms it to a data.frame, where each row represents a single pairwise comparison.
+#' @param dist Distance matrix (object of class 'dist')
+#' @param tri Logical, if TRUE - only lower triangular part of dist will be returned
+dist2list <- function (dist, tri=TRUE) {
+  if (!class(dist) == "dist") { stop("Error: The input data must be a dist object.\n") }
+  
+  dat <- as.data.frame(as.matrix(dist))
+  if (is.null(names(dat))) {
+    rownames(dat) <- paste(1:nrow(dat))
+  }
+  value <- stack(dat)$values
+  rnames <- rownames(dat)
+  namecol <- expand.grid(rnames, rnames)
+  colnames(namecol) <- c("col", "row")
+  res <- data.frame(namecol, value)
+  
+  if(tri == TRUE){    # return only lower triangular part of dist
+    res <- res[-which(upper.tri(as.matrix(dist), diag = T)), ]
+  }
+  
+  return(res)
+}
+
+
+### Function to calculate, extract and plot the % of nestedness in beta diversity
+# type_distance options: nonphylo, phylo
+# fam options = jaccard, sorensen
+# return_what options: plot, data
+plot_nestedness = function(phyloseq_object, type_distance = "nonphylo", fam = "sorensen",return_what = "plot"){
+  require(betapart)
+  require(phyloseq)
+  require(ggplot2)
+  require(magrittr)
+  require(dplyr)
+  require(phytools)
+  
+  
+  
+  # Get sample data
+  data_samples = data.frame(sample_data(phyloseq_object))
+  
+  # Extract and binarize otu table
+  table_binary = t(data.frame(otu_table(phyloseq_object)))
+  table_binary[table_binary != 0] = 1
+  
+  # If distance = Jaccard
+  if(type_distance == "nonphylo"){
+    beta_res = beta.pair(table_binary, index.family=fam)
+    beta_res_nest_prop = beta_res[[2]]/(beta_res[[2]] + beta_res[[1]])
+  }
+  
+  # If distance = Unifrac
+  if(type_distance == "phylo"){
+    beta_res = phylo.beta.pair(table_binary, tree = midpoint_root(phy_tree(phyloseq_object)),index.family=fam)
+    beta_res_nest_prop = beta_res[[2]]/(beta_res[[2]] + beta_res[[1]])
+  }
+  
+  
+  # Turn distance matrix into a list and prepare the dataframe with samples information
+  beta_res_nest_prop = dist2list(beta_res_nest_prop)
+  beta_res_nest_prop = merge(beta_res_nest_prop, data_samples[,c("sample","site","plant","level")], by.x = "col", by.y = "sample")
+  beta_res_nest_prop = merge(beta_res_nest_prop, data_samples[,c("sample","site","plant","level")], by.x = "row", by.y = "sample")
+  
+  beta_res_nest_prop = beta_res_nest_prop %>% 
+    mutate(same_site = ifelse(site.x == site.y,1,0),
+           same_plant = ifelse(plant.x == plant.y,1,0),
+           same_level = ifelse(level.x == level.y,1,0),
+           type = same_site*100 + same_plant*10 + same_level) %>%
+    mutate(type = ifelse(type %in% c(0,1),1,type)) %>%
+    mutate(type = factor(type, levels = c("110","100","101","1")))
+  
+  # Make plot
+  
+  res_plot = ggplot(beta_res_nest_prop)+
+    theme_bw()+
+    geom_point(aes(x = as.factor(type), y = value, col = type), position = position_jitter(width = 0.25, seed = 987654321), 
+               alpha = 0.5, show.legend = F, size = 2)+
+    geom_boxplot(aes(x = as.factor(type), y = value), fill = NA, outlier.alpha = 0)+
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+    ylim(c(-0.01,1.01))+ ylab("Proportion nestedness")+xlab("")+
+    scale_x_discrete(breaks = c("110","101","100","1"), labels = c("Same plant","Same site,\nsame level","Same site,\ndifferent level","Different site"))
+  
+  
+  if(return_what == "plot"){return(res_plot)}
+  if(return_what == "data"){return(beta_res_nest_prop)}  
+  
+}
+
+#### Clean brmsfit output for nestedness stats
+clean_brm_output2 = function(brm_fit){
+  require(performance)
+  require(bayestestR)
+  
+  chains = as.data.frame(brm_fit)
+  chains = chains[,c("b_Intercept","bsp_motype","simo_motype1[1]","simo_motype1[2]","simo_motype1[3]")]
+  
+  summary_chains = as.data.frame(t(apply(chains, MARGIN = 2, FUN = function(x){c(mean(x), as.numeric(bayestestR::hdi(x,ci = 0.95, verbose = TRUE))[2:3])})))
+  colnames( summary_chains) = c("Average","CI95low","CI95high")
+  rownames(summary_chains) = c("Intercept","type","simplexAB","simplexBC","simplexCD")
+  
+  p_dirs = p_direction(chains)
+  summary_chains$p = pd_to_p(p_dirs$pd)
+  summary_chains$p[3:5] = rep(NA,3)
+  
+  r2vals = performance::r2(brm_fit)
+  
+  r2vals = data.frame(rbind(
+    c(r2vals$R2_Bayes, as.numeric(attributes(r2vals)$CI$R2_Bayes)[2:3]),
+    rep(NA,3), rep(NA,3), rep(NA,3), rep(NA,3)))
+  colnames(r2vals) = c("Average","CI95low","CI95high")
+  r2vals = cbind(data.frame(name = c("R2","","","","")),r2vals)
+  
+  
+  summary_chains = cbind(data.frame(predictor = rownames(summary_chains)),summary_chains,r2vals)
+  
+  return(summary_chains)
+}
+
