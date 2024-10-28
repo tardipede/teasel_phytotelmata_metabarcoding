@@ -1,5 +1,8 @@
 # Data
 /data/*
+!/data/16S/01_raw/readme.txt
+!/data/18S/01_raw/readme.txt
+
 
 # History files
 .Rhistory
