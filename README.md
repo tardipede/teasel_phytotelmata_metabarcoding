@@ -11,6 +11,22 @@ This study aims at producing the first DNA metabarcoding dataset of *Dipsacus fu
 |<img src="images/Image_dipsacus_3.jpg" height ="220">|<img src="images/Image_dipsacus_1.jpg" height ="220">|<img src="images/Image_dipsacus_2.jpg" height ="220">|
 
 
+## How to run
+The intermediate files and the analysis results are already present in this repository, however if you wish to re-run the analysis clone this repository on your computer and delete all the intermediate and results files inside their folders.  
+Download the fast.gz files with the reads from NCBI SRA (Bioproject PRJNA1177995 - they are quite heavy so they are excluded from this Github repository).  
+  
+You need conda/mamba installed.  
+First create and activate a conda environment, in your bash shell type:
+```
+mamba env create -f environment.yml
+conda activate DP_metabar
+```
+
+Then make all the scripts exectuable and run them:
+```
+chmod +x code/*
+bash code/000_run_all.bash
+```
 
 
 [^1]: Oboňa, J., Svitková, I., Fogašová, K., Manko, P., Rendoš, M., & Svitok, M. (2024). Water-filled leaf axils in teasel plants: A study of often overlooked aquatic habitats. *Limnologica*, 105, 126157. https://doi.org/10.1016/j.limno.2024.126157
