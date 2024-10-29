@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
 # Process reads for 18S and 16S datasets
-Rscript code/101_setup_reads_process.R "EUK" "18S" "18S" "(ID[0-9]{4})" "((DFP)-.{3})"
-Rscript code/101_setup_reads_process.R "BAC" "16S" "16S" "(ID[0-9]{4})" "((DFP)-.{3})"
+#Rscript code/101_setup_reads_process.R "EUK" "18S" "18S" "(ID[0-9]{4})" "((DFP)-.{3})"
+#Rscript code/101_setup_reads_process.R "BAC" "16S" "16S" "(ID[0-9]{4})" "((DFP)-.{3})"
 
 # Create R-phyloseq objects
 Rscript code/102_create_phyloseq_objects.R
@@ -26,7 +26,7 @@ Rscript code/107_plot_nestedness.R
 Rscript code/108_stats_nestedness.R
 
 # Taxonomic composition plots
-Rscript code/109_taxonomic_compositon_barplots.R
+Rscript code/109_taxonomic_composition_barplots.R
 
 # Save otu tables with taxonomy as excel files
 Rscript code/110_save_otu_tables_in_excel.R
