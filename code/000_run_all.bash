@@ -27,7 +27,8 @@ Rscript code/107_plot_nestedness.R
 # Do stats on nestedness
 Rscript code/108_stats_nestedness.R
 
-
+# Taxonomic composition plots
+Rscript code/109_taxonomic_compositon_barplots.R
 
 # Save otu tables with taxonomy as excel files
 Rscript code/110_save_otu_tables_in_excel.R

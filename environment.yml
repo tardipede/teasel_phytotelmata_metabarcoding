@@ -19,6 +19,7 @@ dependencies:
  - r-performance=0.12.2
  - r-picante=1.8.2
  - r-phytools=2.3_0
+ - r-taxonomizr=0.10.6
  - r-writexl=1.5.1
  - r-vegan=2.6_8
  - bioconductor-dada2=1.30.0
