@@ -81,3 +81,17 @@ ggsave("./results/figures/plot_NMDS.pdf",
        plot = plot_nmds, 
        height = 10, 
        width = 14)
+
+
+## PERMANOVA
+data_samples = data.frame(sample_data(euk_dataset))
+data_samples$level = factor(data_samples$level)
+data_samples$plant = factor(data_samples$plant)
+
+permanova_jac = adonis2(jac_dist ~ level + site/plant, data = data_samples, permutations = 9999, sqrt.dist = TRUE) # square distances to euclidify them
+permanova_tur = adonis2(tur_dist ~ level + site/plant, data = data_samples, permutations = 9999, sqrt.dist = TRUE) # square distances to euclidify them
+
+results_perm_jac = as.data.frame(permanova_jac); results_perm_jac = cbind(data.frame(pred = rownames(results_perm_jac)),results_perm_jac)
+results_perm_tur = as.data.frame(permanova_tur); results_perm_tur = cbind(data.frame(pred = rownames(results_perm_tur)),results_perm_tur)
+
+writexl::write_xlsx(list(Jaccard = results_perm_jac, turnover = results_perm_tur), "./results/tables/PERMANOVA.xlsx")
