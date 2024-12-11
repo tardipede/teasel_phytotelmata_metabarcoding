@@ -14,7 +14,12 @@ This study aims at producing the first DNA metabarcoding dataset of *Dipsacus fu
 ## How to run
 The intermediate files and the analysis results are already present in this repository, however if you wish to re-run the analysis clone this repository on your computer and delete all the intermediate and results files inside their folders.  
 
-1 - Download the fast.gz files with the reads from NCBI SRA (Bioproject PRJNA1177995 - they are quite heavy so they are excluded from this Github repository).  
+Start by cloning this repo on your computer
+```
+git clone https://github.com/tardipede/teasel_phytotelmata_metabarcoding.git
+```
+
+1 - Download the fast.gz files with the reads from NCBI SRA (Bioproject PRJNA1177995 - they are quite heavy so they are excluded from this Github repository) and place them in the appropriate 01_raw folders inside 18S and 18S folders.  
 2 - Download the SILVA r138 training set downloaded from: http://www2.decipher.codes/Classification/TrainingSets/SILVA_SSU_r138_2019.RData, move it to the *databases* folder and rename it as SILVA_SSU_r138.rds
 
 3 - Create and activate a conda environment (You need conda/mamba installed in your system), in your bash shell type:
